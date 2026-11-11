@@ -1,3 +1,4 @@
+
 name: Build Jar Tu Zip
 on:
   workflow_dispatch:
@@ -8,19 +9,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Giai nen file zip
+
+      - name: Tim va giai nen file zip
         run: |
-          unzip -o velo-plus-plus-v3-source.zip
-          mv velo-plus-plus-v3-project/* .
+          ls -la
+          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
+          echo "Dang giai nen: $ZIP_FILE"
+          unzip -o "$ZIP_FILE" -d extracted_files
+          if [ -d "extracted_files/velo-plus-plus-v3-project" ]; then
+            cp -r extracted_files/velo-plus-plus-v3-project/* .
+          else
+            cp -r extracted_files/* .
+          fi
+          rm -rf extracted_files
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.0'
+
       - name: Build Addon JAR
         run: gradle build
+
       - name: Xuat file JAR
         uses: actions/upload-artifact@v4
         with:
