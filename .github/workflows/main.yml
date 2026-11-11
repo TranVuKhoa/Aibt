@@ -1,0 +1,28 @@
+name: Build Jar Tu Zip
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Giai nen file zip
+        run: |
+          unzip -o velo-plus-plus-v3-source.zip
+          mv velo-plus-plus-v3-project/* .
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.0'
+      - name: Build Addon JAR
+        run: gradle build
+      - name: Xuat file JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: Velo-Addon-Jar
+          path: build/libs/*.jar
